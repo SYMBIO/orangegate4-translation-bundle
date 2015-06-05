@@ -1,0 +1,32 @@
+{
+    "name": "symbio/orangegate4-translation-bundle",
+    "type": "symfony-bundle",
+    "description": "SYMBIO OrangeGateTranslationBundle",
+    "keywords": ["Admin Generator", "admin", "orangegate", "bootstrap"],
+    "homepage": "http://www.symbiodigital.com/",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "SYMBIO Developers",
+            "email": "dev@symbiodigital.com",
+            "homepage": "http://www.symbiodigital.com"
+        }
+    ],
+    "require": {
+        "symfony/symfony": "~2.5",
+        "doctrine/orm": "~2.4,<2.5",
+        "symbio/orangegate4-admin-bundle": "~1.0@dev"
+    },
+    "require-dev": {
+    },
+    "suggest": {
+    },
+    "autoload": {
+        "psr-4": { "Symbio\\OrangeGate\\TranslationBundle\\": "" }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}
