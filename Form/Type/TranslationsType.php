@@ -56,6 +56,7 @@ class TranslationsType extends AbstractType
     {
         $view->vars['default_locale'] = $options['default_locale'];
         $view->vars['required_locales'] = $options['required_locales'];
+        $view->vars['translation_domain'] = $options['translation_domain'];
     }
 
     /**
@@ -72,6 +73,7 @@ class TranslationsType extends AbstractType
             'required_locales' => $this->requiredLocales,
             'fields' => array(),
             'exclude_fields' => array(),
+            'translation_domain' => ''
         ));
     }
 
