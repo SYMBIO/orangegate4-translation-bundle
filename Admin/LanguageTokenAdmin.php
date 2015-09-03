@@ -2,9 +2,11 @@
 
 namespace Symbio\OrangeGate\TranslationBundle\Admin;
 
+use Sonata\PageBundle\Model\SiteManagerInterface;
 use Symbio\OrangeGate\AdminBundle\Admin\Admin as BaseAdmin;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Route\RouteCollection;
+use Symbio\OrangeGate\PageBundle\Entity\SitePool;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
@@ -15,14 +17,24 @@ use Knp\Menu\ItemInterface as MenuItemInterface;
 
 class LanguageTokenAdmin extends BaseAdmin
 {
+    protected $siteManager;
+    protected $sitePool;
+
     protected function configureFormFields(FormMapper $formMapper)
     {
+        $site = $this->getSite();
+        if (!$site) {
+            $formMapper
+                ->add('token', 'text', array('label' => 'Key'));
+        } else {
+            $formMapper
+                ->add('token', 'text', array('label' => 'Key', 'data' => strtolower($site->getName().'.')));
+        }
         $formMapper
-            ->add('token', 'text', array('label' => 'Key'))
             ->add('translations', 'sonata_type_collection', array(), array(
-                    'edit' => 'inline',
-                    'inline' => 'table',
-                    'sortable'  => 'position'
+                'edit' => 'inline',
+                'inline' => 'table',
+                'sortable'  => 'position'
             ));
     }
 
@@ -31,6 +43,7 @@ class LanguageTokenAdmin extends BaseAdmin
     {
         $datagridMapper
             ->add('token')
+            ->add('site')
         ;
     }
 
@@ -69,6 +82,7 @@ class LanguageTokenAdmin extends BaseAdmin
     public function prePersist($object)
     {
         $em = $this->modelManager->getEntityManager('SymbioOrangeGateTranslationBundle:LanguageToken');
+        $site = $this->sitePool->getCurrentSite($this->getRequest());
 
         $container = $this->getConfigurationPool()->getContainer();
         $cacheDir = $container->get('kernel')->getCacheDir();
@@ -86,6 +100,7 @@ class LanguageTokenAdmin extends BaseAdmin
         foreach ($object->getTranslations() as $tr) {
             $tr->setLanguageToken($object);
         }
+        $object->setSite($site);
     }
 
     public function preUpdate($object)
@@ -100,7 +115,7 @@ class LanguageTokenAdmin extends BaseAdmin
         foreach($finder as $file){
             unlink($file->getRealpath());
         }
-        
+
         if (is_dir($cacheDir.'/translations')) {
             rmdir($cacheDir.'/translations');
         }
@@ -110,4 +125,65 @@ class LanguageTokenAdmin extends BaseAdmin
         }
     }
 
+    public function getNewInstance()
+    {
+        $instance = parent::getNewInstance();
+
+        if (!$this->hasRequest()) {
+            return $instance;
+        }
+
+        if ($site = $this->getSite()) {
+            $instance->setSite($site);
+        }
+
+
+        return $instance;
+    }
+
+    /**
+     * @return SiteInterface
+     *
+     * @throws \RuntimeException
+     */
+    public function getSite()
+    {
+        if (!$this->hasRequest()) {
+            return false;
+        }
+
+        $siteId = null;
+
+        if ($this->getRequest()->getMethod() == 'POST') {
+            $values = $this->getRequest()->get($this->getUniqid());
+            $siteId = isset($values['site']) ? $values['site'] : null;
+        }
+
+        $siteId = (null !== $siteId) ? $siteId : $this->getRequest()->get('siteId');
+
+        if ($siteId) {
+            $site = $this->siteManager->findOneBy(array('id' => $siteId));
+
+            if (!$site) {
+                throw new \RuntimeException('Unable to find the site with id=' . $this->getRequest()->get('siteId'));
+            }
+
+            return $site;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param \Sonata\PageBundle\Model\SiteManagerInterface $siteManager
+     */
+    public function setSiteManager(SiteManagerInterface $siteManager)
+    {
+        $this->siteManager = $siteManager;
+    }
+
+    public function setSitePool(SitePool $sitePool)
+    {
+        $this->sitePool = $sitePool;
+    }
 }

@@ -26,6 +26,18 @@
         <source>Language</source>
         <target>Jazyk</target>
       </trans-unit>
+      <trans-unit id="tokens.list_site_label">
+        <source>tokens.list_site_label</source>
+        <target>Překlady</target>
+      </trans-unit>
+      <trans-unit id="link_action_create">
+        <source>link_action_create</source>
+        <target>Přidat nový</target>
+      </trans-unit>
+      <trans-unit id="Site">
+        <source>Site</source>
+        <target>Web</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

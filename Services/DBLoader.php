@@ -2,6 +2,8 @@
 
 namespace Symbio\OrangeGate\TranslationBundle\Services;
 
+use Symbio\OrangeGate\PageBundle\Entity\SitePool;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Translation\Loader\LoaderInterface;

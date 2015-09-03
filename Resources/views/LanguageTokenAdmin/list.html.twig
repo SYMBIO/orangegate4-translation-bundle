@@ -1,0 +1,78 @@
+{% extends 'SymbioOrangeGateAdminBundle:CRUD:base_list.html.twig' %}
+
+{% block actions %}
+    {% spaceless %}
+        {% if admin.hasRoute('create') and admin.isGranted('CREATE')%}
+            <a class="btn btn-success sonata-action-element" href="{{ admin.generateUrl('create', { siteId: currentSite.id }) }}">
+                <i class="fa fa-plus"></i>&nbsp;
+                {{ 'link_action_create'|trans({}, 'SymbioOrangeGateTranslationBundle') }}</a>
+        {% endif %}
+    {% endspaceless %}
+{% endblock %}
+
+{% block navbar_title %}
+    {{ 'tokens.list_site_label'|trans({}, 'SymbioOrangeGateTranslationBundle') }}
+    <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <strong class="text-info">{{ currentSite.name }}</strong> <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            {% for site in sites %}
+                <li>
+                    <a href="{{ admin.generateUrl('list', { 'site': site.id }) }}">
+                        {{ site.name }}
+                        {% if currentSite and site.id == currentSite.id %}
+                            <span class="pull-right">
+                                    <i class="fa fa-check"></i>
+                                </span>
+                        {% endif %}
+                    </a>
+                </li>
+            {% endfor%}
+        </ul>
+    </div>
+{% endblock %}
+
+{% block list_table %}
+    <div class="box box-primary">
+        <div class="box-body table-responsive">
+            {{ sonata_block_render_event('sonata.admin.list.table.top', { 'admin': admin }) }}
+
+            {% block list_header %}{% endblock %}
+
+            {% set batchactions = admin.batchactions %}
+            {% if admin.datagrid.results|length > 0 %}
+                {% if admin.hasRoute('batch') %}
+                    <form action="{{ admin.generateUrl('batch', {'filter': admin.filterParameters}) }}" method="POST" >
+                    <input type="hidden" name="_sonata_csrf_token" value="{{ csrf_token }}">
+                {% endif %}
+                <table class="table table-bordered table-striped">
+                    {% block table_header %}
+                        {{ parent() }}
+                    {% endblock %}
+
+                    {% block table_body %}
+                        <tbody>
+                        {% include admin.getTemplate('outer_list_rows') with {'tokens': tokens}%}
+                        </tbody>
+                    {% endblock %}
+
+                    {% block table_footer %}
+                        {{ parent() }}
+                    {% endblock %}
+                </table>
+                {% if admin.hasRoute('batch') %}
+                    </form>
+                {% endif %}
+            {% else %}
+                <div class="callout callout-info">
+                    {{ 'no_result'|trans({}, 'SonataAdminBundle') }}
+                </div>
+            {% endif %}
+
+            {% block list_footer %}{% endblock %}
+
+            {{ sonata_block_render_event('sonata.admin.list.table.bottom', { 'admin': admin }) }}
+        </div>
+    </div>
+{% endblock %}

@@ -61,3 +61,10 @@ services:
             - [ setRequest, [@request_stack] ]
         tags:
             - { name: form.type, alias: orangegate_translatedEntity }
+
+    orangegate_translation.language_token.repository:
+        class:           Doctrine\ORM\EntityRepository
+        factory_service: doctrine.orm.entity_manager
+        factory_method:  getRepository
+        arguments: [Symbio\OrangeGate\TranslationBundle\Entity\LanguageToken]
+

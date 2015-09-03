@@ -29,6 +29,12 @@ class LanguageToken
     private $token;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Symbio\OrangeGate\PageBundle\Entity\Site", cascade={"persist"})
+     * @ORM\JoinColumn(name="site_id", referencedColumnName="id", onDelete="CASCADE")
+     */
+    protected $site;
+
+    /**
      *
      * @ORM\OneToMany(targetEntity="Symbio\OrangeGate\TranslationBundle\Entity\LanguageTranslation", mappedBy="languageToken", fetch="EAGER", cascade={"persist"})
      */
@@ -125,4 +131,28 @@ class LanguageToken
     {
         return $this->token;
     }
+
+    /**
+     * Get site
+     *
+     * @return mixed
+     */
+    public function getSite()
+    {
+        return $this->site;
+    }
+
+    /**
+     * Set site
+     *
+     * @param mixed $site
+     * @return LanguageToken
+     */
+    public function setSite($site)
+    {
+        $this->site = $site;
+        return $this;
+    }
+
+
 }

@@ -2,9 +2,12 @@
 
 namespace Symbio\OrangeGate\TranslationBundle\Admin;
 
+use Sonata\PageBundle\Model\SiteManagerInterface;
 use Symbio\OrangeGate\AdminBundle\Admin\Admin as BaseAdmin;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Route\RouteCollection;
+use Symbio\OrangeGate\PageBundle\Entity\SitePool;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
@@ -15,10 +18,25 @@ use Knp\Menu\ItemInterface as MenuItemInterface;
 
 class LanguageTranslationAdmin extends BaseAdmin
 {
+    protected $sitePool;
+
+    public function __construct($code, $class, $baseControllerName, SitePool $sitePool)
+    {
+        parent::__construct($code, $class, $baseControllerName);
+        $this->sitePool = $sitePool;
+    }
+
     protected function configureFormFields(FormMapper $formMapper)
     {
+        $currentSite = $this->sitePool->getCurrentSite($this->getRequest());
+        $locales = array();
+
+        foreach ($currentSite->getLanguageVersions() as $lv) {
+            $locales[$lv->getLocale()] = $lv->getName();
+        }
+
         $formMapper
-            ->add('language', 'choice', array('label' => 'Jazyk', 'expanded' => false, 'choices' => array('cs' => 'Czech', 'en' => 'English', 'de' => 'German')))
+            ->add('language', 'choice', array('label' => 'Jazyk', 'expanded' => false, 'choices' => $locales))
             ->add('translation', 'text', array('label' => 'Překlad'))
             ;
     }

@@ -3,14 +3,17 @@ services:
         class: Symbio\OrangeGate\TranslationBundle\Admin\LanguageTokenAdmin
         tags:
             - { name: sonata.admin, manager_type: orm, group: Content, label: Překlady }
-        arguments: [null, Symbio\OrangeGate\TranslationBundle\Entity\LanguageToken, null]
+        arguments: [null, Symbio\OrangeGate\TranslationBundle\Entity\LanguageToken, SymbioOrangeGateTranslationBundle:LanguageTokenAdmin]
         calls:
             - [ setTranslationDomain, [SymbioOrangeGateTranslationBundle] ]
+            - [ setSiteManager, [@sonata.page.manager.site] ]
+            - [ setSitePool, [@orangegate.site.pool] ]
+            - [ setTemplates, [outer_list_rows: SymbioOrangeGateTranslationBundle:LanguageTokenAdmin:list_outer_rows.html.twig] ]
 
     orangegate.admin.translation:
         class: Symbio\OrangeGate\TranslationBundle\Admin\LanguageTranslationAdmin
         tags:
             - { name: sonata.admin, manager_type: orm, group: Content, label: Překlady }
-        arguments: [null, Symbio\OrangeGate\TranslationBundle\Entity\LanguageTranslation, null]
+        arguments: [null, Symbio\OrangeGate\TranslationBundle\Entity\LanguageTranslation, null, @orangegate.site.pool]
         calls:
             - [ setTranslationDomain, [SymbioOrangeGateTranslationBundle] ]
