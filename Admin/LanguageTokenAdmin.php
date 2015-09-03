@@ -34,7 +34,8 @@ class LanguageTokenAdmin extends BaseAdmin
             ->add('translations', 'sonata_type_collection', array(), array(
                 'edit' => 'inline',
                 'inline' => 'table',
-                'sortable'  => 'position'
+                'sortable'  => 'position',
+                'admin_code' => 'orangegate.admin.translation'
             ));
     }
 
@@ -43,10 +44,11 @@ class LanguageTokenAdmin extends BaseAdmin
     {
         $datagridMapper
             ->add('token')
-            ->add('site')
+            ->add('site', null, array(
+                'show_filter' => false,
+            ))
         ;
     }
-
 
     public function getExportFields()
     {
