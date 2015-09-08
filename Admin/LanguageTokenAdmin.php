@@ -22,13 +22,15 @@ class LanguageTokenAdmin extends BaseAdmin
 
     protected function configureFormFields(FormMapper $formMapper)
     {
+        $slugify = new \Cocur\Slugify\Slugify();
+
         $site = $this->getSite();
         if (!$site) {
             $formMapper
                 ->add('token', 'text', array('label' => 'Key'));
         } else {
             $formMapper
-                ->add('token', 'text', array('label' => 'Key', 'data' => strtolower($site->getName().'.')));
+                ->add('token', 'text', array('label' => 'Key', 'data' => $slugify->slugify(strtolower($site->getSlug())).'.'));
         }
         $formMapper
             ->add('translations', 'sonata_type_collection', array(), array(
