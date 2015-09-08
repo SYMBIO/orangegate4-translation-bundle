@@ -17,7 +17,7 @@ class GetTokensCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('orangegate:translation:gettokens')
+            ->setName('orangegate:translation:get-tokens')
             ->setDescription('Search for tokens in project/cms and put them into db');
     }
 
