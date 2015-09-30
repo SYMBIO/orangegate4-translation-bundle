@@ -58,12 +58,17 @@ class GetTokensCommand extends ContainerAwareCommand
                 }
 
                 if ($add && !in_array($tokenName, $services) && !in_array($tokenName, $tokens)) {
-                    if (!$em->getRepository('SymbioOrangeGateTranslationBundle:LanguageToken')->findOneBy(array('token' => $tokenName))) {
-                        $tokens[] = $tokenName;
-                        $token = new \Symbio\OrangeGate\TranslationBundle\Entity\LanguageToken();
-                        $token->setToken($tokenName);
-                        $token->setSite($tokenSite);
-                        $em->persist($token);
+                    if (strpos($tokenName, '|trans') !== false) {
+                        $tokenName = substr($tokenName, 0, strpos($tokenName, '|trans'));
+                    }
+                    if (strpos($tokenName, '%') === false) {
+                        if (!$em->getRepository('SymbioOrangeGateTranslationBundle:LanguageToken')->findOneBy(array('token' => $tokenName))) {
+                            $tokens[] = $tokenName;
+                            $token = new \Symbio\OrangeGate\TranslationBundle\Entity\LanguageToken();
+                            $token->setToken($tokenName);
+                            $token->setSite($tokenSite);
+                            $em->persist($token);
+                        }
                     }
                 }
             }
@@ -76,12 +81,17 @@ class GetTokensCommand extends ContainerAwareCommand
             if (preg_match('/\'orangegate\.(.*)\'/', $fileContent, $matches) || preg_match('/\"orangegate\.(.*)\"/', $fileContent, $matches)) {
                 $tokenName = str_replace("\"", '', str_replace('\'', '', $matches[0]));
                 if (!in_array($tokenName, $services) && !in_array($tokenName, $tokens)) {
-                    if (!$em->getRepository('SymbioOrangeGateTranslationBundle:LanguageToken')->findOneBy(array('token' => $tokenName))) {
-                        $tokens[] = $tokenName;
-                        $token = new \Symbio\OrangeGate\TranslationBundle\Entity\LanguageToken();
-                        $token->setToken($tokenName);
-                        $token->setSite(null);
-                        $em->persist($token);
+                    if (strpos($tokenName, '|trans') !== false) {
+                        $tokenName = substr($tokenName, 0, strpos($tokenName, '|trans'));
+                    }
+                    if (strpos($tokenName, '%') === false) {
+                        if (!$em->getRepository('SymbioOrangeGateTranslationBundle:LanguageToken')->findOneBy(array('token' => $tokenName))) {
+                            $tokens[] = $tokenName;
+                            $token = new \Symbio\OrangeGate\TranslationBundle\Entity\LanguageToken();
+                            $token->setToken($tokenName);
+                            $token->setSite(null);
+                            $em->persist($token);
+                        }
                     }
                 }
             }
@@ -90,8 +100,8 @@ class GetTokensCommand extends ContainerAwareCommand
         $em->flush();
 
         foreach ($tokens as $token) {
-            $output->writeln('Token "'.$token.'" successfully inserted.');
+            $output->writeln('---> Token "'.$token.'" successfully inserted.');
         }
-        $output->writeln('done');
+        $output->writeln('Operation complete!');
     }
 }
