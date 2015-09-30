@@ -59,7 +59,7 @@ class GetTokensCommand extends ContainerAwareCommand
 
                 if ($add && !in_array($tokenName, $services) && !in_array($tokenName, $tokens)) {
                     if (strpos($tokenName, '|trans') !== false) {
-                        $tokenName = substr($tokenName, 0, strlen($tokenName) - (strlen($tokenName) - strpos($tokenName, '|trans')));
+                        $tokenName = substr($tokenName, 0, strpos($tokenName, '|trans'));
                     }
                     if (strpos($tokenName, '%') === false) {
                         if (!$em->getRepository('SymbioOrangeGateTranslationBundle:LanguageToken')->findOneBy(array('token' => $tokenName))) {
@@ -82,7 +82,7 @@ class GetTokensCommand extends ContainerAwareCommand
                 $tokenName = str_replace("\"", '', str_replace('\'', '', $matches[0]));
                 if (!in_array($tokenName, $services) && !in_array($tokenName, $tokens)) {
                     if (strpos($tokenName, '|trans') !== false) {
-                        $tokenName = substr($tokenName, 0, strlen($tokenName) - (strlen($tokenName) - strpos($tokenName, '|trans')));
+                        $tokenName = substr($tokenName, 0, strpos($tokenName, '|trans'));
                     }
                     if (strpos($tokenName, '%') === false) {
                         if (!$em->getRepository('SymbioOrangeGateTranslationBundle:LanguageToken')->findOneBy(array('token' => $tokenName))) {
