@@ -7,6 +7,7 @@ parameters:
     orangegate_translation.default.type.translationsForms.class: Symbio\OrangeGate\TranslationBundle\Form\Type\TranslationsFormsType
     orangegate_translation.default.type.translationsLocalesSelector.class: Symbio\OrangeGate\TranslationBundle\Form\Type\TranslationsLocalesSelectorType
     orangegate_translation.default.type.translatedEntity.class: Symbio\OrangeGate\TranslationBundle\Form\Type\TranslatedEntityType
+    orangegate_translation.translationsDataCollector.class: Symbio\OrangeGate\TranslationBundle\DataCollector\TranslationsDataCollector
 
 services:
     translation.loader.db:
@@ -67,4 +68,16 @@ services:
         factory_service: doctrine.orm.entity_manager
         factory_method:  getRepository
         arguments: [Symbio\OrangeGate\TranslationBundle\Entity\LanguageToken]
+
+    orangegate_translation.language_catalogue.repository:
+        class:           Doctrine\ORM\EntityRepository
+        factory_service: doctrine.orm.entity_manager
+        factory_method:  getRepository
+        arguments: [Symbio\OrangeGate\TranslationBundle\Entity\LanguageCatalogue]
+
+    orangegate_translation.data_collector.translations:
+        class: %orangegate_translation.translationsDataCollector.class%
+        arguments: [@translator.default, @orangegate_translation.language_catalogue.repository]
+        tags:
+            - { name: data_collector, template: 'SymbioOrangeGateTranslationBundle:DataCollector:translations.html.twig', id: 'orangegate_translation.data_collector.translations', priority: 1 }
 

@@ -2,6 +2,7 @@
 
 namespace Symbio\OrangeGate\TranslationBundle\Entity;
 
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -24,9 +25,19 @@ class LanguageToken
     /**
      * @var string
      *
-     * @ORM\Column(name="token", type="string", length=255, unique=true)
+     * @ORM\Column(name="token", type="string", length=255)
      */
     private $token;
+
+
+    /**
+     *
+     * @Assert\NotNull()
+     *
+     * @ORM\ManyToOne(targetEntity="Symbio\OrangeGate\TranslationBundle\Entity\LanguageCatalogue", inversedBy="tokens", cascade={"persist"})
+     * @ORM\JoinColumn(name="catalogue_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
+     */
+    private $catalogue;
 
     /**
      * @ORM\ManyToOne(targetEntity="Symbio\OrangeGate\PageBundle\Entity\Site", cascade={"persist"})
@@ -36,7 +47,7 @@ class LanguageToken
 
     /**
      *
-     * @ORM\OneToMany(targetEntity="Symbio\OrangeGate\TranslationBundle\Entity\LanguageTranslation", mappedBy="languageToken", fetch="EAGER", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="Symbio\OrangeGate\TranslationBundle\Entity\LanguageTranslation", mappedBy="languageToken", fetch="EAGER", cascade={"persist", "remove"}, orphanRemoval=true)
      */
     private $translations;
 
@@ -151,6 +162,28 @@ class LanguageToken
     public function setSite($site)
     {
         $this->site = $site;
+        return $this;
+    }
+
+    /**
+     * Get catalogue
+     *
+     * @return mixed
+     */
+    public function getCatalogue()
+    {
+        return $this->catalogue;
+    }
+
+    /**
+     * Set catalogue
+     *
+     * @param mixed $catalogue
+     * @return LanguageToken
+     */
+    public function setCatalogue($catalogue)
+    {
+        $this->catalogue = $catalogue;
         return $this;
     }
 

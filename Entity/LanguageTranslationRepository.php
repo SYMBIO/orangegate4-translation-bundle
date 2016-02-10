@@ -18,7 +18,7 @@ class LanguageTranslationRepository extends EntityRepository
      * @param type $domain
      */
     public function getTranslations($language, $catalogue = "messages"){
-        $query = $this->getEntityManager()->createQuery("SELECT t FROM SymbioOrangeGateTranslationBundle:LanguageTranslation t WHERE t.language = :language AND t.catalogue = :catalogue");
+        $query = $this->getEntityManager()->createQuery("SELECT t FROM SymbioOrangeGateTranslationBundle:LanguageTranslation t LEFT JOIN t.languageToken tt LEFT JOIN tt.catalogue c  WHERE t.language = :language AND c.name = :catalogue");
         $query->setParameter("language", $language);
         $query->setParameter("catalogue", $catalogue);
 
