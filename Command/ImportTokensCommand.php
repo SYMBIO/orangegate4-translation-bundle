@@ -11,14 +11,14 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Config\FileLocator;
 
-class GetTokensCommand extends ContainerAwareCommand
+class ImportTokensCommand extends ContainerAwareCommand
 {
     const DEFAULT_CATALOGUE =  "messages";
 
     protected function configure()
     {
         $this
-            ->setName('orangegate:translation:get-tokens')
+            ->setName('orangegate:translation:import-tokens')
             ->setDescription('Search for tokens in project/cms and put them into db');
     }
 
