@@ -2,8 +2,7 @@
 
 namespace Symbio\OrangeGate\TranslationBundle\DataCollector;
 
-use Symbio\OrangeGate\TranslationBundle\Entity\CatalogueRepository;
-use Symbio\OrangeGate\TranslationBundle\Entity\LanguageCatalogueRepository;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
@@ -15,7 +14,7 @@ class TranslationsDataCollector extends DataCollector
     private $translator;
     private $catalogueRepository;
 
-    public function  __construct(Translator $translator, LanguageCatalogueRepository $catalogueRepository)
+    public function  __construct(Translator $translator, EntityRepository $catalogueRepository)
     {
         $this->translator = $translator;
         $this->catalogueRepository = $catalogueRepository;

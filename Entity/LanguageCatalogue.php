@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * LanguageCatalogue
  *
  * @ORM\Table()
- * @ORM\Entity(repositoryClass="Symbio\OrangeGate\TranslationBundle\Entity\LanguageCatalogueRepository")
+ * @ORM\Entity()
  * @UniqueEntity("name")
  */
 class LanguageCatalogue
@@ -36,6 +36,14 @@ class LanguageCatalogue
      */
     private $name;
 
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->tokens = new \Doctrine\Common\Collections\ArrayCollection();
+    }
 
     /**
      * Get id
