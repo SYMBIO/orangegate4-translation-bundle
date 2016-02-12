@@ -6,12 +6,12 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class GetLoadedTranslationsCommand extends ContainerAwareCommand
+class PrintLoadedTranslationsCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-            ->setName('orangegate:translation:get-loaded-translations')
+            ->setName('orangegate:translation:print-loaded-translations')
             ->setDescription('Print loaded translations from DB. Use --env=prod to run command in prod environment.');
     }
 
