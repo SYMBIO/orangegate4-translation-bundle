@@ -11,20 +11,24 @@ use Doctrine\ORM\EntityManager;
 
 class DBLoader implements LoaderInterface{
     private $translationRepository;
+    private $catalogueRepository;
 
     /**
      * @param EntityManager $entityManager
      */
     public function __construct(EntityManager $entityManager){
         $this->translationRepository = $entityManager->getRepository("SymbioOrangeGateTranslationBundle:LanguageTranslation");
+        $this->catalogueRepository = $entityManager->getRepository("SymbioOrangeGateTranslationBundle:LanguageCatalogue");
     }
 
     function load($resource, $locale, $domain = 'messages'){
-        $translations = $this->translationRepository->getTranslations($locale, $domain);
+        $cataloguesDB = $this->catalogueRepository->findAll();
         $catalogue = new MessageCatalogue($locale);
-
-        foreach($translations as $translation){
-            $catalogue->set($translation->getLanguageToken()->getToken(), $translation->getTranslation(), $domain);
+        foreach ($cataloguesDB as $ctlg) {
+            $translations = $this->translationRepository->getTranslations($locale, $ctlg->getName());
+            foreach($translations as $translation){
+                $catalogue->set($translation->getLanguageToken()->getToken(), $translation->getTranslation(), $ctlg->getName());
+            }
         }
 
         $catalogue->addResource(new FileResource($resource));

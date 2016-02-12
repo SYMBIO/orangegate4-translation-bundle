@@ -32,3 +32,11 @@ services:
         arguments: [null, Symbio\OrangeGate\TranslationBundle\Entity\LanguageTranslation, null]
         calls:
             - [ setTranslationDomain, [SymbioOrangeGateTranslationBundle] ]
+
+    orangegate.admin.language_catalogue:
+        class: Symbio\OrangeGate\TranslationBundle\Admin\LanguageCatalogueAdmin
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: Content, label: Katalogy }
+        arguments: [null, Symbio\OrangeGate\TranslationBundle\Entity\LanguageCatalogue, null]
+        calls:
+            - [ setTranslationDomain, [SymbioOrangeGateTranslationBundle] ]

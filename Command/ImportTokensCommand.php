@@ -2,8 +2,7 @@
 
 namespace Symbio\OrangeGate\TranslationBundle\Command;
 
-use Proxies\__CG__\Agrofert\Bundle\AgrofertBundle\Entity\CHCompany;
-use Proxies\__CG__\Symbio\OrangeGate\TranslationBundle\Entity\LanguageToken;
+use Symbio\OrangeGate\TranslationBundle\Entity\LanguageCatalogue;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,12 +11,14 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Config\FileLocator;
 
-class GetTokensCommand extends ContainerAwareCommand
+class ImportTokensCommand extends ContainerAwareCommand
 {
+    const DEFAULT_CATALOGUE =  "messages";
+
     protected function configure()
     {
         $this
-            ->setName('orangegate:translation:get-tokens')
+            ->setName('orangegate:translation:import-tokens')
             ->setDescription('Search for tokens in project/cms and put them into db');
     }
 
@@ -38,7 +39,7 @@ class GetTokensCommand extends ContainerAwareCommand
         $services = $container->getServiceIds();
 
         $sites = $em->getRepository('SymbioOrangeGatePageBundle:Site')->findAll();
-        $tokens = array();
+        $tokens = [];
 
         // find tokens in src files
         $srcFinder->files()->in($this->getContainer()->get('kernel')->getRootDir().'/../src')->name('*.php')->name('*.html.twig');
@@ -58,14 +59,35 @@ class GetTokensCommand extends ContainerAwareCommand
                 }
 
                 if ($add && !in_array($tokenName, $services) && !in_array($tokenName, $tokens)) {
+                    $catalogueName = "";
                     if (strpos($tokenName, '|trans') !== false) {
+                        $catalogueName = substr($tokenName, strrpos($tokenName, '(') + 1, strlen($tokenName));
+                        if (strpos($catalogueName, ',') !== false) {
+                            $catalogueName = substr($catalogueName, strrpos($catalogueName, ',') + 1, strlen($catalogueName));
+                        }
                         $tokenName = substr($tokenName, 0, strpos($tokenName, '|trans'));
                     }
+                    if (strpos($tokenName, ',') !== false) {
+                        $tokenName = str_replace(' ', '', $tokenName);
+                        $catalogueName = substr($tokenName, strrpos($tokenName, ',') + 1, strlen($tokenName));
+                        $tokenName = substr($tokenName, 0, strpos($tokenName, ','));
+                    }
+
+                    $catalogueName = $catalogueName == $tokenName || !$catalogueName ? self::DEFAULT_CATALOGUE : $catalogueName;
+
                     if (strpos($tokenName, '%') === false) {
-                        if (!$em->getRepository('SymbioOrangeGateTranslationBundle:LanguageToken')->findOneBy(array('token' => $tokenName))) {
+                        $catalogue = $em->getRepository("SymbioOrangeGateTranslationBundle:LanguageCatalogue")->findOneByName($catalogueName);
+                        if (!$catalogue) {
+                            $catalogue = new LanguageCatalogue();
+                            $catalogue->setName($catalogueName);
+                            $em->persist($catalogue);
+                        }
+
+                        if (!$em->getRepository('SymbioOrangeGateTranslationBundle:LanguageToken')->findOneBy(['token' => $tokenName])) {
                             $tokens[] = $tokenName;
                             $token = new \Symbio\OrangeGate\TranslationBundle\Entity\LanguageToken();
                             $token->setToken($tokenName);
+                            $token->setCatalogue($catalogue);
                             $token->setSite($tokenSite);
                             $em->persist($token);
                         }
@@ -75,20 +97,41 @@ class GetTokensCommand extends ContainerAwareCommand
         }
 
         //find tokens in cms bundles
-        $cmsFinder->files()->in($this->getContainer()->get('kernel')->getRootDir().'/../vendor/symbio');
+        $cmsFinder->files()->in($this->getContainer()->get('kernel')->getRootDir().'/../vendor/symbio')->notName('*.json');
         foreach ($cmsFinder as $file) {
             $fileContent = file_get_contents($file->getRealPath());
             if (preg_match('/\'orangegate\.(.*)\'/', $fileContent, $matches) || preg_match('/\"orangegate\.(.*)\"/', $fileContent, $matches)) {
                 $tokenName = str_replace("\"", '', str_replace('\'', '', $matches[0]));
                 if (!in_array($tokenName, $services) && !in_array($tokenName, $tokens)) {
+                    $catalogueName = "";
                     if (strpos($tokenName, '|trans') !== false) {
+                        $tokenName = str_replace(' ', '', $tokenName);
+                        $catalogueName = substr($tokenName, strrpos($tokenName, '(') + 1, strlen($tokenName));
+                        if (strpos($catalogueName, ',') !== false) {
+                            $catalogueName = substr($catalogueName, strrpos($catalogueName, ',') + 1, strlen($catalogueName));
+                        }
                         $tokenName = substr($tokenName, 0, strpos($tokenName, '|trans'));
                     }
+                    if (strpos($tokenName, ',') !== false) {
+                        $tokenName = str_replace(' ', '', $tokenName);
+                        $catalogueName = substr($tokenName, strrpos($tokenName, ',') + 1, strlen($tokenName));
+                        $tokenName = substr($tokenName, 0, strpos($tokenName, ','));
+                    }
+
+                    $catalogueName = $catalogueName == $tokenName || !$catalogueName ? self::DEFAULT_CATALOGUE : $catalogueName;
                     if (strpos($tokenName, '%') === false) {
-                        if (!$em->getRepository('SymbioOrangeGateTranslationBundle:LanguageToken')->findOneBy(array('token' => $tokenName))) {
+                        $catalogue = $em->getRepository("SymbioOrangeGateTranslationBundle:LanguageCatalogue")->findOneByName($catalogueName);
+                        if (!$catalogue) {
+                            $catalogue = new LanguageCatalogue();
+                            $catalogue->setName($catalogueName);
+                            $em->persist($catalogue);
+                        }
+
+                        if (!$em->getRepository('SymbioOrangeGateTranslationBundle:LanguageToken')->findOneBy(['catalogue' => $catalogue, 'token' => $tokenName])) {
                             $tokens[] = $tokenName;
                             $token = new \Symbio\OrangeGate\TranslationBundle\Entity\LanguageToken();
                             $token->setToken($tokenName);
+                            $token->setCatalogue($catalogue);
                             $token->setSite(null);
                             $em->persist($token);
                         }
