@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Config\FileLocator;
 
@@ -130,15 +131,18 @@ class UpdateSystemTranslationsCommand extends ContainerAwareCommand
 
         //clear translations cache
         $cacheDir = $this->getContainer()->get('kernel')->getCacheDir();
-        $finder = new Finder();
-        $finder->in([$cacheDir . '/../*/translations'])->files();
+        $fs = new Filesystem();
+        if ($fs->exists($cacheDir . '/../*/translations')) {
+            $finder = new Finder();
+            $finder->in([$cacheDir . '/../*/translations'])->files();
 
-        foreach ($finder as $file) {
-            unlink($file->getRealPath());
-        }
+            foreach ($finder as $file) {
+                unlink($file->getRealPath());
+            }
 
-        if (is_dir($cacheDir . '/translations')) {
-            rmdir($cacheDir . '/translations');
+            if (is_dir($cacheDir . '/translations')) {
+                rmdir($cacheDir . '/translations');
+            }
         }
 
         $output->writeln("Operation complete!");
