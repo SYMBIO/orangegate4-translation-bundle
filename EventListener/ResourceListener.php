@@ -21,9 +21,11 @@ class ResourceListener
     {
 		$site = $this->siteSelector->retrieve();
 
-		foreach ($site->getLocales() as $locale) {
-			$this->translator->addResource('db', null, $locale, 'messages');
-			$this->translator->addResource('db', null, $locale, 'validators');
+		if ($site) {
+			foreach ($site->getLocales() as $locale) {
+				$this->translator->addResource('db', null, $locale, 'messages');
+				$this->translator->addResource('db', null, $locale, 'validators');
+			}
 		}
     }
 
@@ -31,6 +33,8 @@ class ResourceListener
 	{
 		$site = $this->siteSelector->retrieve();
 
-		$this->translator->setLocale($site->getLocale());
+		if ($site) {
+			$this->translator->setLocale($site->getLocale());
+		}
 	}
 }
