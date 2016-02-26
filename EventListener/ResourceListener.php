@@ -17,7 +17,13 @@ class ResourceListener
     public function onKernelRequest(GetResponseEvent $event)
     {
     	$this->container->get('translator')->addResource('db', null, $this->container->get('request')->getLocale(), 'messages');
-
     	$this->container->get('translator')->addResource('db', null, $this->container->get('request')->getLocale(), 'validators');
     }
+
+
+	public function onKernelException(GetResponseEvent $event)
+	{
+		$this->container->get('translator')->addResource('db', null, $this->container->get('request')->getLocale(), 'messages');
+		$this->container->get('translator')->addResource('db', null, $this->container->get('request')->getLocale(), 'validators');
+	}
 }
