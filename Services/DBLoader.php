@@ -26,8 +26,8 @@ class DBLoader implements LoaderInterface{
         $catalogue = new MessageCatalogue($locale);
         foreach ($cataloguesDB as $ctlg) {
             $translations = $this->translationRepository->getTranslations($locale, $ctlg->getName());
-            foreach($translations as $translation){
-                $catalogue->set($translation->getLanguageToken()->getToken(), $translation->getTranslation(), $ctlg->getName());
+            foreach($translations as $token => $translation){
+                $catalogue->set($token, $translation, $ctlg->getName());
             }
         }
 

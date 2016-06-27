@@ -25,14 +25,14 @@ class LanguageCatalogue
     private $id;
 
     /**
-     * @ORM\OneToMany(targetEntity="Symbio\OrangeGate\TranslationBundle\Entity\LanguageToken", mappedBy="catalogue", fetch="EAGER", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="Symbio\OrangeGate\TranslationBundle\Entity\LanguageToken", mappedBy="catalogue", cascade={"persist", "remove"})
      */
     private $tokens;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string", length=1000, unique=true)
+     * @ORM\Column(name="name", type="string", length=255, unique=true)
      */
     private $name;
 

@@ -12,16 +12,30 @@ use Doctrine\ORM\EntityRepository;
  */
 class LanguageTranslationRepository extends EntityRepository
 {
-	/**
+    /**
      * Return all translations for specified token
      * @param type $token
      * @param type $domain
      */
-    public function getTranslations($language, $catalogue = "messages"){
-        $query = $this->getEntityManager()->createQuery("SELECT t FROM SymbioOrangeGateTranslationBundle:LanguageTranslation t LEFT JOIN t.languageToken tt LEFT JOIN tt.catalogue c  WHERE t.language = :language AND c.name = :catalogue");
+    public function getTranslations($language, $catalogue = "messages")
+    {
+        $query = $this->getEntityManager()->createQuery("
+            SELECT PARTIAL t.{id,translation},PARTIAL tt.{id,token}
+            FROM SymbioOrangeGateTranslationBundle:LanguageTranslation t
+            LEFT JOIN t.languageToken tt
+            LEFT JOIN tt.catalogue c
+            WHERE
+              t.language = :language
+            AND
+              c.name = :catalogue");
         $query->setParameter("language", $language);
         $query->setParameter("catalogue", $catalogue);
 
-        return $query->getResult();
+        $ret = [];
+        foreach ($query->getScalarResult() as $res) {
+            $ret[$res['tt_token']] = $res['t_translation'];
+        }
+
+        return $ret;
     }
 }
