@@ -7,6 +7,7 @@ use Symbio\OrangeGate\AdminBundle\Admin\Admin as BaseAdmin;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Route\RouteCollection;
 use Symbio\OrangeGate\PageBundle\Entity\SitePool;
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
@@ -174,17 +175,12 @@ class LanguageTokenAdmin extends BaseAdmin
     public function clearCache()
     {
         $container = $this->getConfigurationPool()->getContainer();
-        $cacheDir = $container->get('kernel')->getCacheDir();
-        $finder = new \Symfony\Component\Finder\Finder();
-        $finder->in(array($cacheDir . "/../*/translations"))->files();
+        $filesystem = $container->get('filesystem');
+        $envs = ['prod', 'dev'];
 
-        foreach($finder as $file){
-            unlink($file->getRealpath());
-        }
-
-        if (is_dir($cacheDir.'/translations')) {
-            rmdir($cacheDir.'/translations');
+        foreach ($envs as $env) {
+            $cacheDir = $container->getParameter('kernel.cache_dir').'/../'.$env.'/translations';
+            $filesystem->remove($cacheDir);
         }
     }
 }
-

@@ -38,4 +38,28 @@ class LanguageTranslationRepository extends EntityRepository
 
         return $ret;
     }
+
+    /**
+     * Return all used locales for specified catalogue
+     * @param type $token
+     * @param type $domain
+     */
+    public function getLocalesForDomain($domain)
+    {
+        $query = $this->getEntityManager()->createQuery("
+            SELECT DISTINCT PARTIAL t.{id,language}
+            FROM SymbioOrangeGateTranslationBundle:LanguageTranslation t
+            INNER JOIN t.languageToken tt
+            LEFT JOIN tt.catalogue c
+            WHERE
+              c.name = :catalogue");
+        $query->setParameter("catalogue", $domain);
+
+        $ret = [];
+        foreach ($query->getScalarResult() as $res) {
+            $ret[] = $res['t_language'];
+        }
+
+        return $ret;
+    }
 }
