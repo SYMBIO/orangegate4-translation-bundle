@@ -38,6 +38,10 @@
         <source>Site</source>
         <target>Web</target>
       </trans-unit>
+      <trans-unit id="System translations">
+        <source>System translations</source>
+        <target>Systémové překlady</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
