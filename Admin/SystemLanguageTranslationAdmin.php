@@ -2,27 +2,42 @@
 
 namespace Symbio\OrangeGate\TranslationBundle\Admin;
 
-use Sonata\PageBundle\Model\SiteManagerInterface;
-use Symbio\OrangeGate\AdminBundle\Admin\Admin as BaseAdmin;
-use Sonata\AdminBundle\Admin\AdminInterface;
-use Sonata\AdminBundle\Route\RouteCollection;
-use Symbio\OrangeGate\PageBundle\Entity\SitePool;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
-
-use Knp\Menu\ItemInterface as MenuItemInterface;
+use Symbio\OrangeGate\AdminBundle\Admin\Admin as BaseAdmin;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class SystemLanguageTranslationAdmin extends BaseAdmin
 {
+    protected $translator;
+    protected $locales;
+
+    public function __construct($code, $class, $baseControllerName, TranslatorInterface $translator, $locales)
+    {
+        parent::__construct($code, $class, $baseControllerName);
+
+        $this->translator = $translator;
+        $this->locales = $locales;
+    }
+
     protected function configureFormFields(FormMapper $formMapper)
     {
+        $languages = [];
+        foreach($this->locales as $locale) {
+            $languages[$locale] = \Locale::getDisplayLanguage(sprintf('%s-Latn-IT-nedis', $locale), $this->translator->getLocale());
+        }
+
         $formMapper
-            ->add('language', 'choice', array('label' => 'Jazyk', 'expanded' => false, 'choices' => array('cs' => 'Čeština', 'en' => 'English')))
-            ->add('translation', 'text', array('label' => 'Překlad'))
+            ->add('language', 'choice', array(
+                'label' => $this->translator->trans('Language', [], 'SymbioOrangeGateTranslationBundle'),
+                'expanded' => false,
+                'choices' => $languages
+            ))
+            ->add('translation', 'text', array(
+                'label' => $this->translator->trans('Translation', [], 'SymbioOrangeGateTranslationBundle')
+            ))
         ;
     }
 

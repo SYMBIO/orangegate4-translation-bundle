@@ -29,6 +29,6 @@ services:
         class: Symbio\OrangeGate\TranslationBundle\Admin\SystemLanguageTranslationAdmin
         tags:
             - { name: sonata.admin, manager_type: orm, group: Content, label: System translations }
-        arguments: [null, Symbio\OrangeGate\TranslationBundle\Entity\LanguageTranslation, null]
+        arguments: [null, Symbio\OrangeGate\TranslationBundle\Entity\LanguageTranslation, null, @translator, %orangegate_translation.locales%]
         calls:
             - [ setTranslationDomain, [SymbioOrangeGateTranslationBundle] ]
