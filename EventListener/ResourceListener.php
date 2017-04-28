@@ -2,22 +2,39 @@
 
 namespace Symbio\OrangeGate\TranslationBundle\EventListener;
 
+use Sonata\PageBundle\Site\SiteSelectorInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\DependencyInjection\ContainerInterface as Container;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ResourceListener
 {
-	private $container;
+	private $translator;
+	private $siteSelector;
 
-	public function __construct(Container $container)
+	public function __construct(TranslatorInterface $translator, SiteSelectorInterface $siteSelector)
 	{
-		$this->container = $container;
+		$this->translator = $translator;
+		$this->siteSelector = $siteSelector;
 	}
 
     public function onKernelRequest(GetResponseEvent $event)
     {
-    	$this->container->get('translator')->addResource('db', null, $this->container->get('request')->getLocale(), 'messages');
+		$site = $this->siteSelector->retrieve();
 
-    	$this->container->get('translator')->addResource('db', null, $this->container->get('request')->getLocale(), 'validators');
+		if ($site) {
+			foreach ($site->getLocales() as $locale) {
+				$this->translator->addResource('db', null, $locale, 'messages');
+				$this->translator->addResource('db', null, $locale, 'validators');
+			}
+		}
     }
+
+	public function onKernelException(GetResponseEvent $event)
+	{
+		$site = $this->siteSelector->retrieve();
+
+		if ($site) {
+			$this->translator->setLocale($site->getLocale());
+		}
+	}
 }

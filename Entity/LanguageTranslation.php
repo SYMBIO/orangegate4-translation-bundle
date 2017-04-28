@@ -21,12 +21,6 @@ class LanguageTranslation
      */
     private $id;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="catalogue", type="string", length=255)
-     */
-    private $catalogue = "messages";
 
     /**
      * @var string
@@ -55,29 +49,6 @@ class LanguageTranslation
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Set catalogue
-     *
-     * @param string $catalogue
-     * @return LanguageTranslation
-     */
-    public function setCatalogue($catalogue)
-    {
-        $this->catalogue = $catalogue;
-
-        return $this;
-    }
-
-    /**
-     * Get catalogue
-     *
-     * @return string
-     */
-    public function getCatalogue()
-    {
-        return $this->catalogue;
     }
 
     /**

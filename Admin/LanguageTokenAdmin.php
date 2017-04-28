@@ -7,6 +7,7 @@ use Symbio\OrangeGate\AdminBundle\Admin\Admin as BaseAdmin;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Route\RouteCollection;
 use Symbio\OrangeGate\PageBundle\Entity\SitePool;
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
@@ -31,6 +32,7 @@ class LanguageTokenAdmin extends BaseAdmin
                 ->add('token', 'text', array('label' => 'Key', 'data' => strtolower($site->getSlug()).'.'));
         }
         $formMapper
+            ->add('catalogue', 'sonata_type_model_list', array())
             ->add('translations', 'sonata_type_collection', array(), array(
                 'edit' => 'inline',
                 'inline' => 'table',
@@ -44,6 +46,7 @@ class LanguageTokenAdmin extends BaseAdmin
     {
         $datagridMapper
             ->add('token')
+            ->add('catalogue')
             ->add('site', null, array(
                 'show_filter' => false,
             ))
@@ -63,6 +66,8 @@ class LanguageTokenAdmin extends BaseAdmin
     {
         $listMapper
             ->addIdentifier('token')
+            ->addIdentifier('catalogue')
+            ->addIdentifier('site')
             ->add('_action', 'actions', array(
                 'actions' => array(
                     'edit' => array(),
@@ -78,53 +83,32 @@ class LanguageTokenAdmin extends BaseAdmin
         $showMapper
             ->add('id')
             ->add('token', null, array('label' => 'Key'))
+            ->add('catalogue', null, array('label' => 'Catalogue'))
         ;
     }
 
     public function prePersist($object)
     {
-        $em = $this->modelManager->getEntityManager('SymbioOrangeGateTranslationBundle:LanguageToken');
         $site = $this->sitePool->getCurrentSite($this->getRequest());
-
-        $container = $this->getConfigurationPool()->getContainer();
-        $cacheDir = $container->get('kernel')->getCacheDir();
-        $finder = new \Symfony\Component\Finder\Finder();
-        $finder->in(array($cacheDir . "/../*/translations"))->files();
-
-        foreach($finder as $file){
-            unlink($file->getRealpath());
-        }
-
-        if (is_dir($cacheDir.'/translations')) {
-            rmdir($cacheDir.'/translations');
-        }
 
         foreach ($object->getTranslations() as $tr) {
             $tr->setLanguageToken($object);
         }
         $object->setSite($site);
+        $this->clearCache();
     }
 
     public function preUpdate($object)
     {
-        $em = $this->modelManager->getEntityManager('SymbioOrangeGateTranslationBundle:LanguageToken');
-
-        $container = $this->getConfigurationPool()->getContainer();
-        $cacheDir = $container->get('kernel')->getCacheDir();
-        $finder = new \Symfony\Component\Finder\Finder();
-        $finder->in(array($cacheDir . "/../*/translations"))->files();
-
-        foreach($finder as $file){
-            unlink($file->getRealpath());
-        }
-
-        if (is_dir($cacheDir.'/translations')) {
-            rmdir($cacheDir.'/translations');
-        }
-
         foreach ($object->getTranslations() as $tr) {
             $tr->setLanguageToken($object);
         }
+        $this->clearCache();
+    }
+
+    public function postRemove($object)
+    {
+        $this->clearCache();
     }
 
     public function getNewInstance()
@@ -138,7 +122,6 @@ class LanguageTokenAdmin extends BaseAdmin
         if ($site = $this->getSite()) {
             $instance->setSite($site);
         }
-
 
         return $instance;
     }
@@ -187,5 +170,17 @@ class LanguageTokenAdmin extends BaseAdmin
     public function setSitePool(SitePool $sitePool)
     {
         $this->sitePool = $sitePool;
+    }
+
+    public function clearCache()
+    {
+        $container = $this->getConfigurationPool()->getContainer();
+        $filesystem = $container->get('filesystem');
+        $envs = ['prod', 'dev'];
+
+        foreach ($envs as $env) {
+            $cacheDir = $container->getParameter('kernel.cache_dir').'/../'.$env.'/translations';
+            $filesystem->remove($cacheDir);
+        }
     }
 }

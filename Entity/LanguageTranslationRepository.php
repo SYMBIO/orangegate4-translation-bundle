@@ -12,16 +12,54 @@ use Doctrine\ORM\EntityRepository;
  */
 class LanguageTranslationRepository extends EntityRepository
 {
-	/**
+    /**
      * Return all translations for specified token
      * @param type $token
      * @param type $domain
      */
-    public function getTranslations($language, $catalogue = "messages"){
-        $query = $this->getEntityManager()->createQuery("SELECT t FROM SymbioOrangeGateTranslationBundle:LanguageTranslation t WHERE t.language = :language AND t.catalogue = :catalogue");
+    public function getTranslations($language, $catalogue = "messages")
+    {
+        $query = $this->getEntityManager()->createQuery("
+            SELECT PARTIAL t.{id,translation},PARTIAL tt.{id,token}
+            FROM SymbioOrangeGateTranslationBundle:LanguageTranslation t
+            LEFT JOIN t.languageToken tt
+            LEFT JOIN tt.catalogue c
+            WHERE
+              t.language = :language
+            AND
+              c.name = :catalogue");
         $query->setParameter("language", $language);
         $query->setParameter("catalogue", $catalogue);
 
-        return $query->getResult();
+        $ret = [];
+        foreach ($query->getScalarResult() as $res) {
+            $ret[$res['tt_token']] = $res['t_translation'];
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Return all used locales for specified catalogue
+     * @param type $token
+     * @param type $domain
+     */
+    public function getLocalesForDomain($domain)
+    {
+        $query = $this->getEntityManager()->createQuery("
+            SELECT DISTINCT PARTIAL t.{id,language}
+            FROM SymbioOrangeGateTranslationBundle:LanguageTranslation t
+            INNER JOIN t.languageToken tt
+            LEFT JOIN tt.catalogue c
+            WHERE
+              c.name = :catalogue");
+        $query->setParameter("catalogue", $domain);
+
+        $ret = [];
+        foreach ($query->getScalarResult() as $res) {
+            $ret[] = $res['t_language'];
+        }
+
+        return $ret;
     }
 }
