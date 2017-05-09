@@ -36,6 +36,7 @@ class LanguageTranslation
 
     /**
      * @ORM\ManyToOne(targetEntity="Symbio\OrangeGate\TranslationBundle\Entity\LanguageToken", inversedBy="translations", fetch="EAGER")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $languageToken;
 

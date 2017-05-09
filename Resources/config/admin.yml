@@ -2,7 +2,7 @@ services:
     orangegate.admin.token:
         class: Symbio\OrangeGate\TranslationBundle\Admin\LanguageTokenAdmin
         tags:
-            - { name: sonata.admin, manager_type: orm, group: Content, label: Překlady }
+            - { name: sonata.admin, manager_type: orm, group: Content, label: Translations }
         arguments: [null, Symbio\OrangeGate\TranslationBundle\Entity\LanguageToken, SymbioOrangeGateTranslationBundle:LanguageTokenAdmin]
         calls:
             - [ setTranslationDomain, [SymbioOrangeGateTranslationBundle] ]
@@ -12,7 +12,7 @@ services:
     orangegate.admin.translation:
         class: Symbio\OrangeGate\TranslationBundle\Admin\LanguageTranslationAdmin
         tags:
-            - { name: sonata.admin, manager_type: orm, group: Content, label: Překlady }
+            - { name: sonata.admin, manager_type: orm, group: Content, label: Translations }
         arguments: [null, Symbio\OrangeGate\TranslationBundle\Entity\LanguageTranslation, null, @orangegate.site.pool]
         calls:
             - [ setTranslationDomain, [SymbioOrangeGateTranslationBundle] ]
@@ -20,7 +20,7 @@ services:
     orangegate.admin.system_token:
         class: Symbio\OrangeGate\TranslationBundle\Admin\SystemLanguageTokenAdmin
         tags:
-            - { name: sonata.admin, manager_type: orm, group: Content, label: Systémové překlady }
+            - { name: sonata.admin, manager_type: orm, group: Content, label: System translations }
         arguments: [null, Symbio\OrangeGate\TranslationBundle\Entity\LanguageToken, SymbioOrangeGateTranslationBundle:SystemLanguageTokenAdmin]
         calls:
             - [ setTranslationDomain, [SymbioOrangeGateTranslationBundle] ]
@@ -28,8 +28,8 @@ services:
     orangegate.admin.system_translation:
         class: Symbio\OrangeGate\TranslationBundle\Admin\SystemLanguageTranslationAdmin
         tags:
-            - { name: sonata.admin, manager_type: orm, group: Content, label: Systémové překlady }
-        arguments: [null, Symbio\OrangeGate\TranslationBundle\Entity\LanguageTranslation, null]
+            - { name: sonata.admin, manager_type: orm, group: Content, label: System translations }
+        arguments: [null, Symbio\OrangeGate\TranslationBundle\Entity\LanguageTranslation, null, @translator, %orangegate_translation.locales%]
         calls:
             - [ setTranslationDomain, [SymbioOrangeGateTranslationBundle] ]
 

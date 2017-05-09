@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
+    <body>
+      <trans-unit id="1">
+        <source>Token</source>
+        <target>Key</target>
+      </trans-unit>
+      <trans-unit id="tokens.list_site_label">
+        <source>tokens.list_site_label</source>
+        <target>Translations</target>
+      </trans-unit>
+      <trans-unit id="link_action_create">
+        <source>link_action_create</source>
+        <target>Add new</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
